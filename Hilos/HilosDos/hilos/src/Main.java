@@ -1,5 +1,5 @@
 public class Main {
-    public static synchronized void main(String[] args) {
+    public static void main(String[] args) {
         ThreadX threadA = new ThreadX('A');
         ThreadX threadB = new ThreadX('B');
         ThreadX threadC = new ThreadX('C');

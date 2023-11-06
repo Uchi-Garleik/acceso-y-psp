@@ -34,15 +34,13 @@ public class ThreadX extends Thread{
                     System.out.println("Number: " + i + " -- Thread: " + getLetter());
                     currentThread = nextThread;
                     synchronized (nextThread){nextThread.notify();}
-                    if ( (currentThread.getLetter().equals('C') && i >= 9) ){
-                        System.out.println("bye");
-                    }else{
+                    if ( !(currentThread.getLetter().equals('C') && i >= 9) ){
                         this.wait();
                     }
                 }
             }
         } catch(InterruptedException e){
-            System.out.println("Awaiting orders!");
+            System.out.println("Exception!");
         }
     }
 
