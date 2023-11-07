@@ -11,7 +11,7 @@ public class ThreadX extends Thread{
     public Character getLetter() {
         return letter;
     }
-
+    
     public void setNextThread(ThreadX nextThread) {
         this.nextThread = nextThread;
     }

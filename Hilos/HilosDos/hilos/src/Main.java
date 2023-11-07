@@ -12,7 +12,7 @@ public class Main {
         threadA.start();
         threadB.start();
         threadC.start();
-
+        
 
         System.out.println("I'm the main class");
     }
