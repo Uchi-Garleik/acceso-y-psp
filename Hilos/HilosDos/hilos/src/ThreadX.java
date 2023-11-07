@@ -2,6 +2,7 @@ public class ThreadX extends Thread{
     private Character letter;
     private static ThreadX currentThread = null;
     private ThreadX nextThread;
+    private Boolean finished = false;
 
     public ThreadX(Character letter) {
         this.letter = letter;
@@ -26,21 +27,26 @@ public class ThreadX extends Thread{
     @Override
     public void run() {
         try{
-            synchronized (this){
-                while ( currentThread != this ){
-                    wait();
-                }
-                for (int i = 0; i < 10; i++) {
-                    System.out.println("Number: " + i + " -- Thread: " + getLetter());
-                    currentThread = nextThread;
-                    synchronized (nextThread){nextThread.notify();}
-                    if ( !(currentThread.getLetter().equals('C') && i >= 9) ){
-                        this.wait();
+            if (!finished) {
+                synchronized (this){
+                    while ( currentThread != this ){
+                        wait();
+                    }
+                    for (int i = 0; i < 10; i++) {
+                        System.out.println("Number: " + i + " -- Thread: " + getLetter());
+                        if (i >= 9) {
+                            this.interrupt();
+                        }
+                        currentThread = nextThread;
+                        synchronized (nextThread){nextThread.notify();}
+                        if ( !(currentThread.getLetter().equals('C') && i >= 9) ){
+                            this.wait();
+                        }
                     }
                 }
             }
         } catch(InterruptedException e){
-            System.out.println("Exception!");
+            System.out.println("I am going to sleep!");
         }
     }
 
