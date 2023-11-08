@@ -5,8 +5,8 @@ import java.sql.*;
 
 public class MotorConexion {
     private static MotorConexion motorConexion = null;
-    private String db_url = "jdbc:mysql://localhost:3306/commerceDB";
-    private String db_username = "garleik";
+    private String db_url = "jdbc:mysql://localhost:3306/ecommercedb";
+    private String db_username = "uchi";
     private String db_password = "1234";
     private String db_driver = "com.mysql.cj.jdbc.Driver";
 
@@ -56,6 +56,8 @@ public class MotorConexion {
 
     public ResultSet executeQuery(String sql){
         try {
+            System.out.println(sql);
+            System.out.println("hey");
             return statement.executeQuery(sql);
         } catch (SQLException e) {
             throw new RuntimeException(e);
