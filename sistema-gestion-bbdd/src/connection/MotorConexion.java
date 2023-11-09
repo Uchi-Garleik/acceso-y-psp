@@ -66,10 +66,23 @@ public class MotorConexion {
 
     public int executeUpdate(String sql){
         try {
-            return statement.executeUpdate(sql);
+            connection.setAutoCommit(false);
+            int colMod = statement.executeUpdate(sql);
+            connection.commit();
+            return colMod;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getErrorCode());
+            if (e.getErrorCode() == 1062){
+                System.out.println("Error en clave primaria duplicada");
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+                return 1062;
+            }
         }
+        return 1;
     }
 
 

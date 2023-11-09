@@ -6,8 +6,8 @@ public class Main {
 //        ExportDAO exportDAO = new ExportDAO();
 //        exportDAO.exportTableToXML("usuarios");
 
-        ImportDAO importDAO = new ImportDAO();
-        importDAO.importTableToSQL();
+         ImportDAO importDAO = new ImportDAO();
+         importDAO.importTableToSQL();
 
 
 
