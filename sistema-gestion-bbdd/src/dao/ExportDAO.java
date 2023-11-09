@@ -1,6 +1,7 @@
 package dao;
 
 import connection.MotorConexion;
+import methods.Management;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -12,13 +13,13 @@ import java.sql.SQLException;
 
 public class ExportDAO {
     MotorConexion motorConexion;
-    private final String $FINDALL = "SELECT * FROM ";
+    private String $FINDALL = "SELECT * FROM ";
 
     public ExportDAO(){
         motorConexion = MotorConexion.getMotorConexion();
     }
 
-    public int exportTableToXML(String tableName){
+    public void exportTableToXML(String tableName){
         try {
             ResultSet resultSet;
             motorConexion.connect();
@@ -28,20 +29,27 @@ public class ExportDAO {
             int countColumn = resultSetMetaData.getColumnCount();
 
             XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
-            XMLStreamWriter xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(new PrintWriter(new FileWriter("oasjdoafsjo.xml")));
+            XMLStreamWriter xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(new PrintWriter(new FileOutputStream(tableName + ".xml")));
 
             try {
                 xmlStreamWriter.writeStartDocument();
                 xmlStreamWriter.writeStartElement(tableName);
 
                 while(resultSet.next()){
-                    xmlStreamWriter.writeStartElement(tableName.substring(0,tableName.length()-1));
+                    xmlStreamWriter.writeStartElement(Management.SingularToPlural(tableName));
                     for (int i = 0; i < countColumn; i++) {
                         xmlStreamWriter.writeStartElement(resultSetMetaData.getColumnName(i+1));
+
+                        // Ideally you would check here if the column is FK or not.
+                        // Problem is it depends on the way the fields are written and the PK field could be written as
+                        // id_XXXXX meaning this method would need to be adapted.
+                        // This code ignores FK checking due to the issues it can cause due to the column names
+                        // and it also asumes that the PK_ID field is written as simply "id".
+                        if (resultSetMetaData.getColumnName(i+1).equals("id")){
+                            xmlStreamWriter.writeAttribute("PK","true");
+                        }
+
                         xmlStreamWriter.writeCharacters(resultSet.getString(i+1));
-//                        if (resultSetMetaData.getColumnName(i+1).equals("id")){
-//                            xmlStreamWriter.writeAttribute("pk", "true");
-//                        }
                         xmlStreamWriter.writeEndElement();
                     }
                     xmlStreamWriter.writeEndElement();
@@ -49,6 +57,7 @@ public class ExportDAO {
 
                 xmlStreamWriter.writeEndElement();
                 xmlStreamWriter.writeEndDocument();
+                // Unlike other IO methods, XMLStreamWriter needs to be closed. Otherwise, it wont write anything
                 xmlStreamWriter.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -59,7 +68,6 @@ public class ExportDAO {
             throw new RuntimeException(e);
         }
         motorConexion.close();
-        return 0;
     }
 
 }
