@@ -3,9 +3,14 @@ public class ThreadX extends Thread{
     private static ThreadX currentThread = null;
     private ThreadX nextThread;
     private Boolean finished = false;
+    public static Contador contador;
 
     public ThreadX(Character letter) {
         this.letter = letter;
+        if ( contador == null ) {
+            contador = new Contador();
+        }
+
     }
 
     public Character getLetter() {
@@ -32,14 +37,14 @@ public class ThreadX extends Thread{
                     while ( currentThread != this ){
                         wait();
                     }
-                    for (int i = 0; i < 10; i++) {
-                        System.out.println("Number: " + i + " -- Thread: " + getLetter());
-                        if (i >= 9) {
+                    for (int i = contador.getContador(); contador.getContador() < 100; contador.sumarContador()) {
+                        System.out.println("Number: " + contador.getContador() + " -- Thread: " + getLetter());
+                        if (contador.getContador() >= 99) {
                             this.interrupt();
                         }
                         currentThread = nextThread;
                         synchronized (nextThread){nextThread.notify();}
-                        if ( !(currentThread.getLetter().equals('C') && i >= 9) ){
+                        if ( !(currentThread.getLetter().equals('C') && contador.getContador() >= 99) ){
                             this.wait();
                         }
                     }
