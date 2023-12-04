@@ -14,6 +14,6 @@ public class Main {
         threadC.start();
         
 
-        System.out.println("I'm the main class");
+        System.out.println("I'm there main class");
     }
 }
