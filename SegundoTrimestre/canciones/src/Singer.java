@@ -2,6 +2,7 @@ import java.util.ArrayList;
 
 public class Singer extends Thread {
     private int idSinger;
+    
     private ArrayList<Singer> singers;
     private Song song;
     private int versesToSing;
