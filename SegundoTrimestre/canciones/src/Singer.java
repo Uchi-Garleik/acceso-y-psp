@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Singer extends Thread {
     private int idSinger;
-    
+    private Boolean songFinished;
     private ArrayList<Singer> singers;
     private Song song;
     private int versesToSing;
@@ -10,12 +10,20 @@ public class Singer extends Thread {
     private static int verseCounter = 0;
     @Override
     public synchronized void run() {
-        System.out.println(singers.size());
-        versesToSing = song.getVerses().size() / singers.size();
+        if (singers.size() < song.getVerses().size()){
+            versesToSing = song.getVerses().size() / singers.size();
+            versesToSingLeftToDistribute = song.getVerses().size() % singers.size();
+        }else{
+            versesToSing = song.getVerses().size() / song.getVerses().size();
+            versesToSingLeftToDistribute = 0;
+        }
+        for (int i = 0; i < versesToSingLeftToDistribute; i++) {
+            singers.get(i).setVersesToSing(singers.get(i).getVersesToSing()+1);
+        }
+        System.out.println(versesToSingLeftToDistribute);
         for (int i = 0; i < getVersesToSing(); i++) {
-
             if (getIdSinger() == 0 && verseCounter == 0){
-                System.out.println(song.getVerses().get(verseCounter));
+                System.out.println("Singer ID: "+ this.getIdSinger() + ", sings Verse:" + (verseCounter + 1) + ", " + song.getVerses().get(verseCounter));
                 if (getIdSinger() == singers.size()-1){
                     verseCounter++;
                     singers.get(0).interrupt();
@@ -29,7 +37,13 @@ public class Singer extends Thread {
             try {
                 wait(1000);
             } catch (InterruptedException e) {
-                System.out.println(song.getVerses().get(verseCounter));
+//                if (getIdSinger() >= song.getVerses().size()){
+//                    for (Singer singer :
+//                            singers) {
+//                        singer.interrupt();
+//                    }
+//                }else{
+                System.out.println("Singer ID: "+ this.getIdSinger() + ", sings Verse:" + (verseCounter+1) + ", " + song.getVerses().get(verseCounter));
                 if (getIdSinger() == singers.size()-1){
                     verseCounter++;
                     singers.get(0).interrupt();
@@ -37,6 +51,7 @@ public class Singer extends Thread {
                     verseCounter++;
                     singers.get(getIdSinger()+1).interrupt();
                 }
+//            }
             }
         }
     }
