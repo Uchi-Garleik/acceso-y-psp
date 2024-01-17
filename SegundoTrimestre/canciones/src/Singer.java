@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Singer extends Thread {
     private int idSinger;
-    private Boolean songFinished;
+
     private ArrayList<Singer> singers;
     private Song song;
     private int versesToSing;
@@ -37,12 +37,12 @@ public class Singer extends Thread {
             try {
                 wait(1000);
             } catch (InterruptedException e) {
-//                if (getIdSinger() >= song.getVerses().size()){
-//                    for (Singer singer :
-//                            singers) {
-//                        singer.interrupt();
-//                    }
-//                }else{
+                if (getIdSinger() >= song.getVerses().size()){
+                    for (Singer singer :
+                            singers) {
+                        singer.interrupt();
+                    }
+                }else{
                 System.out.println("Singer ID: "+ this.getIdSinger() + ", sings Verse:" + (verseCounter+1) + ", " + song.getVerses().get(verseCounter));
                 if (getIdSinger() == singers.size()-1){
                     verseCounter++;
@@ -50,8 +50,7 @@ public class Singer extends Thread {
                 }else{
                     verseCounter++;
                     singers.get(getIdSinger()+1).interrupt();
-                }
-//            }
+                }}
             }
         }
     }
