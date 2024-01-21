@@ -20,7 +20,6 @@ public class Singer extends Thread {
         for (int i = 0; i < versesToSingLeftToDistribute; i++) {
             singers.get(i).setVersesToSing(singers.get(i).getVersesToSing()+1);
         }
-        System.out.println(versesToSingLeftToDistribute);
         for (int i = 0; i < getVersesToSing(); i++) {
             if (getIdSinger() == 0 && verseCounter == 0){
                 System.out.println("Singer ID: "+ this.getIdSinger() + ", sings Verse:" + (verseCounter + 1) + ", " + song.getVerses().get(verseCounter));
@@ -37,9 +36,8 @@ public class Singer extends Thread {
             try {
                 wait(1000);
             } catch (InterruptedException e) {
-                if (getIdSinger() >= song.getVerses().size()){
-                    for (Singer singer :
-                            singers) {
+                if (verseCounter+1 > song.getVerses().size()){
+                    for (Singer singer : singers) {
                         singer.interrupt();
                     }
                 }else{

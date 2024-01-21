@@ -6,7 +6,7 @@ public class Main {
         ArrayList<Singer> singers = new ArrayList<>();
         ArrayList<Song> songs = new ArrayList<>();
 
-        // CREATE PRIMO VICTORIA
+        // CREATE PRIMO VICTORIA SONG
             Song songPrimoVictoria = new Song(0, "Sabaton - Primo Victoria");
                 ArrayList<String> versesPrimoVictoria = new ArrayList<>();
                     versesPrimoVictoria.add("Through the gates of Hell, as we make our way to Heaven");
