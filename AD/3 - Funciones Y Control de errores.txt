@@ -1,0 +1,123 @@
+pg 260
+
+CREATE OR REPLACE FUNCTION Encontrar_emple(v_apellido EMPLE.apellido%TYPE DEFAULT 'GIL')
+RETURN REAL
+AS
+/* Zona de declaración de variables*/
+v_numemple EMPLE.emp_no%TYPE;
+
+BEGIN
+/* Zona de código*/
+   SELECT emp_no INTO v_numemple FROM EMPLE
+   WHERE UPPER(apellido) = UPPER(v_apellido);
+/* Comparación en Mayus. por problemas de ASCIIs 'a' != 'A'
+ P.e. 'López' != 'LÓPEZ' para SQL*/
+   
+   RETURN v_numemple;  /* Aqui solo llego sino hay errores */
+
+/* Fin del prog. ppal (de la función)*/
+
+EXCEPTION
+/* Código de manejo de errores  ver pg 290
+// Error 1: No hay permisos del usuario sobre EMPLE
+// Error 2: Que haya más de un empleado con ese apellido
+// Error 3: Que no haya ningún empleado con ese apellido
+*/
+WHEN TOO_MANY_ROWS THEN  /* Error 2 */
+   DBMS_OUTPUT.PUT_LINE('Error !!! Hay más de un empleado con el apellido ' || v_apellido);
+   RETURN(-1);
+
+WHEN NO_DATA_FOUND THEN  /* Error 3 */
+   DBMS_OUTPUT.PUT_LINE('Error !!! No hay ningún empleado con el apellido ' || v_apellido);
+   RETURN(-1);
+   
+WHEN OTHERS THEN
+   DBMS_OUTPUT.PUT_LINE(' Error desconocido !!!');
+   RETURN(-1);
+
+END Encontrar_emple;
+/
+
+
+
+DECLARE 
+  v_resultado REAL;
+BEGIN
+  v_resultado := Encontrar_emple('lolez');
+
+  IF (v_resultado = -1) THEN
+    DBMS_OUTPUT.PUT_LINE('ERROR !!!  La función no ha devuelto ningún dato');
+  ELSE
+    DBMS_OUTPUT.PUT_LINE('El número de Gil es: '||v_resultado);
+  END IF;
+END;
+/
+
+
+DECLARE  /*Segunda forma de ejecutar la función anterior, sin parámetro
+            ver pg 263 */
+   v_num REAL;
+BEGIN
+   v_num := Encontrar_emple();
+   DBMS_OUTPUT.PUT_LINE('El número de Gil es: '||v_num);
+END;
+/
+
+
+PARAMETROS DE TIPO IN OUT
+
+Segunda versión de la función anterior, en esta función si hay error, no petará la función sino que devolverá -1 y en v_apellido el error correspondiente
+
+pg 260
+
+CREATE OR REPLACE FUNCTION Encontrar_emple(v_apellido IN OUT EMPLE.apellido%TYPE DEFAULT 'GIL')
+RETURN REAL
+AS
+/* Zona de declaración de variables*/
+v_numemple EMPLE.emp_no%TYPE;
+
+BEGIN
+/* Zona de código
+   SELECT emp_no INTO v_numemple FROM EMPLE
+   WHERE UPPER(apellido) = UPPER(v_apellido);
+// Comparación en Mayus. por problemas de ASCIIs 'a' != 'A'
+// P.e. 'López' != 'LÓPEZ' para SQL
+*/ 
+   RETURN v_numemple;  /* Aqui solo llego sino hay errores */
+
+/* Fin del prog. ppal (de la función)*/
+
+EXCEPTION
+/* Código de manejo de errores  ver pg 290
+// Error 1: No hay permisos del usuario sobre EMPLE
+// Error 2: Que haya más de un empleado con ese apellido
+// Error 3: Que no haya ningún empleado con ese apellido
+*/
+WHEN TOO_MANY_ROWS THEN  /* Error 2 */
+   v_apellido := 'Más de un empleado';
+   RETURN -1;
+
+WHEN NO_DATA_FOUND THEN  /* Error 3 */
+   v_apellido := 'No datos';
+   RETURN -1;
+   
+WHEN OTHERS THEN
+   DBMS_OUTPUT.PUT_LINE(' Error desconocido !!!');
+
+
+END Encontrar_emple;
+/
+
+DECLARE  /*Invoco la función controlando errores */
+   v_num REAL;
+   v_apellido VARCHAR2(40);
+BEGIN
+   v_apellido := 'GIL';
+   v_num := Encontrar_emple(v_apellido);
+   IF (v_num <> -1) THEN
+   	DBMS_OUTPUT.PUT_LINE('El número de Gil es: '||v_num);
+   ELSE
+        DBMS_OUTPUT.PUT_LINE('Error !!!: '||v_apellido);   
+   END IF;
+END;
+/

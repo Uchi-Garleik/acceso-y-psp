@@ -1,0 +1,287 @@
+ALTER SESSION SET "_ORACLE_SCRIPT" = TRUE;
+set serveroutput on;
+
+In PL/SQL, there are several predefined exceptions related to SQL operations, and these exceptions can be caught using the `SQL%` attributes. Here are some commonly used `SQL%` attributes in PL/SQL:
+
+1. `SQL%FOUND`: Returns `TRUE` if the last SQL statement affected one or more rows. Returns `FALSE` if no rows were affected.
+
+```sql
+IF SQL%FOUND THEN
+    -- Code to handle rows found
+ELSE
+    -- Code to handle no rows found
+END IF;
+```
+
+2. `SQL%NOTFOUND`: Returns `TRUE` if the last SQL statement did not affect any rows. Returns `FALSE` if one or more rows were affected.
+
+```sql
+IF SQL%NOTFOUND THEN
+    -- Code to handle no rows found
+ELSE
+    -- Code to handle rows found
+END IF;
+```
+
+3. `SQL%ROWCOUNT`: Returns the number of rows affected by the last SQL statement.
+
+```sql
+DBMS_OUTPUT.PUT_LINE('Number of rows affected: ' || SQL%ROWCOUNT);
+```
+
+4. `SQL%ISOPEN`: Returns `TRUE` if the cursor is open, and `FALSE` if it is closed.
+
+```sql
+IF SQL%ISOPEN THEN
+    -- Code to handle open cursor
+ELSE
+    -- Code to handle closed cursor
+END IF;
+```
+
+These attributes are typically used in exception handling and conditional logic to determine the outcome of SQL operations in PL/SQL blocks. Keep in mind that these attributes are applicable to the most recent SQL statement executed in the PL/SQL block.
+
+
+
+
+
+
+CREATE OR REPLACE FUNCTION MODIFICARLOCALIDADDEP (IDDEP IN NUMBER, IDLOC IN NUMBER) RETURN NUMBER AS
+    p_SQL VARCHAR2(200);
+    p_Rows NUMBER;
+BEGIN
+    p_SQL := 'UPDATE DEPARTAMENTO DEP SET DEP.ID_LOC = :idloc WHERE DEP.ID_DEP = :iddep';
+    EXECUTE IMMEDIATE p_SQL USING IDLOC, IDDEP;
+
+    IF SQL%FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Se han actualizado ' || SQL%ROWCOUNT || ' campos');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('No se ha podido encontrar el dato a actualizar');
+        RETURN 2;
+    END IF;
+
+    RETURN SQL%ROWCOUNT;
+
+EXCEPTION
+    WHEN TOO_MANY_ROWS THEN
+        DBMS_OUTPUT.PUT_LINE('Se ha intentado actualizar más de un campo a la vez');
+        RETURN 1;
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Ha habido un problema');
+        RETURN 12345;
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE BORRAREMP (IDEMP NUMBER, TABLA VARCHAR2) IS
+  v_sql VARCHAR2(1000);
+BEGIN
+  -- Using dynamic SQL to construct the DELETE statement
+  v_sql := 'DELETE FROM ' || TABLA || ' WHERE ID = :1';
+  
+  BEGIN
+    -- Executing the dynamic SQL
+    EXECUTE IMMEDIATE v_sql USING IDEMP;
+
+    COMMIT; -- Optionally, if you want to commit the changes immediately
+
+  EXCEPTION
+    WHEN OTHERS THEN
+      -- Handle exceptions here
+      DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+  END;
+
+END;
+/
+
+In PL/SQL, there are several predefined exceptions that you can catch. Here are some of the commonly used exceptions:
+
+1. `NO_DATA_FOUND`: Raised when a `SELECT INTO` statement returns no rows.
+
+2. `TOO_MANY_ROWS`: Raised when a `SELECT INTO` statement returns more than one row.
+
+3. `VALUE_ERROR`: Raised when a conversion or assignment operation has an invalid number, character, or datetime value.
+
+4. `ZERO_DIVIDE`: Raised when a division or modulus operation is attempted with a divisor of zero.
+
+5. `PROGRAM_ERROR`: Raised when PL/SQL has an internal problem, such as an unhandled exception.
+
+6. `STORAGE_ERROR`: Raised when a PL/SQL program has insufficient memory or resources.
+
+7. `LOGIN_DENIED`: Raised when a user tries to log in with an invalid username/password.
+
+8. `INVALID_CURSOR`: Raised when an attempt is made to use a cursor that is not open.
+
+9. `CURSOR_ALREADY_OPEN`: Raised when an attempt is made to open a cursor that is already open.
+
+10. `DUP_VAL_ON_INDEX`: Raised when a unique constraint or index violation occurs.
+
+11. `TOO_MANY_COLUMNS`: Raised when a `SELECT INTO` statement returns more columns than the INTO clause can accommodate.
+
+12. `OTHERS`: A catch-all exception that is triggered when none of the specific exceptions is handled.
+
+You can use these exceptions in your `EXCEPTION` block to handle specific errors. For example:
+
+```sql
+BEGIN
+  -- Your PL/SQL code here
+  
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('No data found.');
+  
+  WHEN TOO_MANY_ROWS THEN
+    DBMS_OUTPUT.PUT_LINE('Too many rows found.');
+    
+  WHEN VALUE_ERROR THEN
+    DBMS_OUTPUT.PUT_LINE('Value error occurred.');
+    
+  -- Add other specific exception handlers as needed
+
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+```
+
+It's a good practice to handle exceptions specifically whenever possible and only use the generic `OTHERS` handler as a last resort. This helps in making your code more robust and maintainable.
+
+IF boolean-expression THEN
+  statements
+END IF;
+
+
+IF boolean-expression THEN
+  statements
+ELSE
+  statements
+END IF;
+
+
+
+IF boolean-expression THEN
+  IF boolean-expression THEN
+    statements
+ELSE
+  IF boolean-expression THEN
+    statements
+END IF;
+
+
+CASE
+    Palabra clave que introduce la primera cláusula WHEN en la sentencia CASE .
+WHEN expresión-booleana
+    Especifica una expresión que se evalúa cuando el flujo de control entra en la cláusula WHEN en la que se define la expresión. Si expresión-booleana se evalúa como TRUE, se ejecutan las sentencias de la cláusula THEN correspondiente. Si expresión-booleana no se evalúa como TRUE, se ejecutan las sentencias de la cláusula ELSE correspondiente.
+THEN
+    Palabra clave que introduce las sentencias que se van a ejecutar cuando la expresión booleana correspondiente se evalúa como TRUE.
+sentencias
+    Especifica una o más sentencias SQL o PL/SQL, cada una terminada con un punto y coma.
+ELSE
+
+
+
+DECLARE
+  sum INTEGER := 0;
+BEGIN
+  LOOP
+    sum := sum + 1;
+    IF sum > 10 THEN
+       EXIT;
+    END IF;
+  END LOOP;
+END   
+
+
+DECLARE
+  sum INTEGER := 0;
+BEGIN
+  WHILE sum < 11 LOOP
+    sum := sum + 1;
+  END LOOP;
+END
+
+
+
+
+ ACCESS_INTO_NULL 
+ORA-06530 
+-6530 
+
+CASE_NOT_FOUND 	
+ORA-06592 	
+-6592 
+
+COLLECTION_IS_NULL 	
+ORA-06531 	
+-6531 
+
+CURSOR_ALREADY_OPEN 	
+ORA-06511 
+-6511 
+
+DUP_VAL_ON_INDEX 	
+ORA-00001 	
+-1 
+
+INVALID_CURSOR 	
+ORA-01001 	
+-1001 
+
+INVALID_NUMBER 	
+ORA-01722 	
+-1722 
+
+LOGIN_DENIED 	
+ORA-01017 
+-1017 
+
+NO_DATA_FOUND 	
+ORA-01403 	
++100 
+
+NOT_LOGGED_ON 	
+ORA-01012 	
+-1012 
+
+PROGRAM_ERROR 	
+ORA-06501 	
+-6501 
+
+ROWTYPE_MISMATCH 	
+ORA-06504 	
+-6504 
+
+SELF_IS_NULL 	
+ORA-30625 
+-30625 
+
+STORAGE_ERROR 	
+ORA-06500 	
+-6500 
+
+SUBSCRIPT_BEYOND_COUNT 	
+ORA-06533 	
+-6533 
+
+SUBSCRIPT_OUTSIDE_LIMIT 
+ORA-06532 	
+-6532 
+
+SYS_INVALID_ROWID 	
+ORA-01410 	
+-1410 
+
+TIMEOUT_ON_RESOURCE 	
+ORA-00051 	
+-51 
+
+TOO_MANY_ROWS 	
+ORA-01422 	
+-1422 
+
+VALUE_ERROR 	
+ORA-06502 	
+-6502 
+
+ZERO_DIVIDE 	
+ORA-01476 	
+-1476 
