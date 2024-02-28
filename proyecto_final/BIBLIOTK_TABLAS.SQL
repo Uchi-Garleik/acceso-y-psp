@@ -42,6 +42,7 @@ CONSTRAINT PK_ejemplar PRIMARY KEY (id_edicion, numero),
 CONSTRAINT FK_ejemplar FOREIGN KEY (id_edicion) REFERENCES edicion(id),
 CONSTRAINT NN_alta CHECK (alta IS NOT NULL)
 );
+
 CREATE TABLE obra_audit (
     id NUMBER GENERATED ALWAYS AS IDENTITY START WITH 1 INCREMENT BY 1,
     id_obra CHAR(5) UNIQUE NOT NULL,

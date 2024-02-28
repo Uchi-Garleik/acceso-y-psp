@@ -154,5 +154,24 @@ FUNCTION vincular (p_id_autor VARCHAR, p_id_obra VARCHAR) RETURN INTEGER IS
 
 END;
 
+FUNCTION desvincular (p_id_autor VARCHAR, p_id_obra VARCHAR) RETURN INTEGER IS
+    p_id_autorAux AUTOR.id%TYPE;
+    p_id_obraAux OBRA.id%TYPE;
+    p_countAux NUMBER(3);
+    p_maxLength_idAutor NUMBER(6);
+    p_maxLength_idObra NUMBER(6);
+    BEGIN
+        p_id_autorAux := TRIM(p_id_autor);
+        p_id_obraAux := TRIM(p_id_obra);
+        SELECT MAX(char_length) INTO p_maxLength_idAutor FROM USER_TAB_COLUMNS WHERE TABLE_NAME = 'AUTOR' AND COLUMN_NAME = 'ID';
+        SELECT MAX(char_length) INTO p_maxLength_idObra FROM USER_TAB_COLUMNS WHERE TABLE_NAME = 'OBRA' AND COLUMN_NAME = 'ID';
+        SELECT COUNT(*) INTO p_countAux FROM AUTOR_OBRA WHERE id_autor = p_id_autorAux AND id_obra = p_id_obraAux;
+        IF p_countAux = 0 THEN
+            RAISE NO_DATA_FOUND;
+        END IF;
+        DELETE FROM AUTOR_OBRA WHERE id_autor = p_id_autorAux AND id_obra = p_id_obraAux;
+
+    END;
+
 END BiblioTK;
 /
