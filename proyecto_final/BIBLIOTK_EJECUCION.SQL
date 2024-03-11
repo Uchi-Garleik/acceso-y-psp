@@ -71,3 +71,20 @@ BEGIN
 DBMS_OUTPUT.PUT_LINE(BiblioTK.baja_ejemplar('qweqweqweqwewqeqweqweqweqweqwe','2'));
 END;
 /
+
+
+-- FUNCTION apertura_prestamo (p_id_edicion VARCHAR, p_numero VARCHAR, p_id_socio VARCHAR) RETURN INTEGER;
+DECLARE
+BEGIN
+DBMS_OUTPUT.PUT_LINE(BiblioTK.apertura_prestamo(0,1,1));
+END;
+/
+
+DECLARE
+BEGIN
+DBMS_OUTPUT.PUT_LINE(BiblioTK.cierre_prestamo(2));
+END;
+/
+
+INSERT INTO PRESTAMO(ID_EDICION, NUMERO_EJEMPLAR, ID_SOCIO, FECHA_PRESTAMO, ESTADO_PRESTAMO)
+VALUES('4','1','1',SYSDATE,'pendiente');

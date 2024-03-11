@@ -377,7 +377,87 @@ FUNCTION baja_ejemplar (p_id_edicion VARCHAR, p_numero INTEGER) RETURN INTEGER I
         WHEN OTHERS THEN
             RETURN -2;
 
-    END;
+END;
+
+
+
+FUNCTION apertura_prestamo (p_id_edicion VARCHAR, p_numero VARCHAR, p_id_socio VARCHAR) RETURN INTEGER IS
+    p_maxLength_idEdicion NUMBER(6);
+    p_maxLength_numero NUMBER(6);
+    p_maxLength_idSocio NUMBER(6);
+    p_id_edicionAux EJEMPLAR.ID_EDICION%TYPE;
+    p_id_numeroAux EJEMPLAR.NUMERO%TYPE;
+    p_id_socioAux Socio.ID%TYPE;
+    p_countAux NUMBER(3);
+    BEGIN
+        p_id_numeroAux := TRIM(p_numero);
+        p_id_socioAux := TRIM(p_id_socio);
+        SELECT MAX(char_length) INTO p_maxLength_idEdicion FROM USER_TAB_COLUMNS WHERE TABLE_NAME = 'EJEMPLAR' AND COLUMN_NAME = 'ID_EDICION';
+        IF LENGTH(TRIM(p_id_edicion)) > p_maxLength_idEdicion THEN
+            RAISE VALUE_OUT_OF_RANGE;
+        END IF;
+        p_id_edicionAux := TRIM(p_id_edicion);
+        SELECT COUNT(*) INTO p_countAux FROM SOCIO WHERE ID = p_id_socioAux;
+        IF p_countAux = 0 THEN
+            RAISE NO_DATA_FOUND;
+        END IF;
+
+        -- SELECT COUNT(*) INTO p_countAux FROM EJEMPLAR WHERE ID_EDICION = p_id_edicionAux AND NUMERO = p_id_numeroAux;
+        -- IF p_countAux = 0 THEN
+        --     RAISE NO_DATA_FOUND;
+        -- END IF;
+
+        SELECT COUNT(*) INTO p_countAux FROM EJEMPLAR WHERE (ID_EDICION = p_id_edicionAux AND NUMERO = p_id_numeroAux AND ALTA IS NULL) OR (ID_EDICION = p_id_edicionAux AND NUMERO = p_id_numeroAux AND BAJA < SYSDATE);
+        IF p_countAux = 0 THEN
+            RAISE EJEMPLAR_PRESTADO;
+        END IF;
+
+
+        SELECT COUNT(*) INTO p_countAux FROM PRESTAMO WHERE ID_EDICION = p_id_edicionAux AND NUMERO_EJEMPLAR = p_id_numeroAux AND ESTADO_PRESTAMO IS NULL;
+        IF p_countAux = 0 THEN
+            UPDATE EJEMPLAR SET BAJA = NULL WHERE ID_EDICION = p_id_edicionAux AND NUMERO = p_id_numeroAux;
+            UPDATE EJEMPLAR SET ALTA = SYSDATE WHERE ID_EDICION = p_id_edicionAux AND NUMERO = p_id_numeroAux;
+            INSERT INTO PRESTAMO (ID_EDICION, NUMERO_EJEMPLAR, ID_SOCIO, FECHA_DEVOLUCION, ESTADO_PRESTAMO) VALUES (p_id_edicionAux, p_id_numeroAux, p_id_socioAux, CURRENT_TIMESTAMP + 30, 'prestado');
+            RETURN 0;
+        ELSE
+            RAISE FAILURE_TO_MEET_REQUIREMENTS;
+        END IF;
+
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RETURN 1;
+        WHEN FAILURE_TO_MEET_REQUIREMENTS THEN
+            RETURN 2;
+        WHEN VALUE_OUT_OF_RANGE THEN
+            RETURN 3;
+        WHEN OTHERS THEN
+            RETURN 444;
+END;
+
+FUNCTION cierre_prestamo (ID_PRESTAMOAux NUMBER) RETURN INTEGER IS
+    p_countAux NUMBER(3);
+    p_id_edicion PRESTAMO.ID_EDICION%TYPE;
+    p_numero PRESTAMO.NUMERO_EJEMPLAR%TYPE;
+    CURSOR c_Prestamo IS SELECT ID_EDICION, NUMERO_EJEMPLAR FROM PRESTAMO WHERE PRESTAMO.ID_PRESTAMO = ID_PRESTAMOAux;
+    BEGIN
+        SELECT COUNT(*) INTO p_countAux FROM PRESTAMO WHERE PRESTAMO.ID_PRESTAMO = ID_PRESTAMOAux;
+        IF p_countAux = 0 THEN
+            RAISE NO_DATA_FOUND;
+        END IF;
+        SELECT COUNT(*) INTO p_countAux FROM PRESTAMO WHERE PRESTAMO.ID_PRESTAMO = ID_PRESTAMOAux AND ESTADO_PRESTAMO = 'pendiente';
+        open c_Prestamo;
+        FETCH c_Prestamo INTO p_id_edicion, p_numero;
+        close c_Prestamo;
+
+        UPDATE PRESTAMO SET FECHA_DEVOLUCION_REAL = CURRENT_TIMESTAMP WHERE PRESTAMO.ID_PRESTAMO = ID_PRESTAMOAux;
+        UPDATE PRESTAMO SET ESTADO_PRESTAMO = 'devuelto' WHERE PRESTAMO.ID_PRESTAMO = ID_PRESTAMOAux;
+        UPDATE EJEMPLAR SET BAJA = SYSDATE WHERE ID_EDICION = p_id_edicion AND NUMERO = p_numero;
+
+        RETURN 0;
+
+END;
+
+
 
 END BiblioTK;
 /

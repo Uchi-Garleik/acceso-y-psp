@@ -8,6 +8,7 @@ CREATE OR REPLACE PACKAGE BiblioTK AS
     VALUE_OUT_OF_RANGE EXCEPTION;
     DATA_EXISTS EXCEPTION;
     FAILURE_TO_MEET_REQUIREMENTS EXCEPTION;
+    EJEMPLAR_PRESTADO EXCEPTION;
     FUNCTION alta_obra (p_titulo VARCHAR, p_anyo INTEGER DEFAULT NULL) RETURN VARCHAR;
     FUNCTION borrado_obra (p_id VARCHAR) RETURN INTEGER;
     FUNCTION alta_autor (p_nombre VARCHAR, p_apellidos VARCHAR, p_nacimiento DATE DEFAULT NULL) RETURN VARCHAR;
@@ -19,6 +20,8 @@ CREATE OR REPLACE PACKAGE BiblioTK AS
     FUNCTION alta_ejemplar (p_id_edicion VARCHAR) RETURN INTEGER;
     FUNCTION borrado_ejemplar (p_id_edicion VARCHAR, p_numero INTEGER) RETURN INTEGER;
     FUNCTION baja_ejemplar (p_id_edicion VARCHAR, p_numero INTEGER) RETURN INTEGER;
+    FUNCTION apertura_prestamo (p_id_edicion VARCHAR, p_numero VARCHAR, p_id_socio VARCHAR) RETURN INTEGER;
+    FUNCTION cierre_prestamo (ID_PRESTAMOAux number) RETURN INTEGER;
 END BiblioTK;
 /
 
